@@ -3,7 +3,6 @@ package com.sihai.acm;
 import java.util.Scanner;
 
 /**
-*
 * acm 输入模板（多数之和）
 * @author ${author}
 */

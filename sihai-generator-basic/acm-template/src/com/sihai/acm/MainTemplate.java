@@ -3,7 +3,6 @@ package com.sihai.acm;
 import java.util.Scanner;
 
 /**
-*
 * acm 输入模板（多数之和）
 * @author sihai
 */
@@ -28,7 +27,7 @@ public class MainTemplate {
                 sum += num;
             }
 
-            System.out.println("sum = : " + sum);
+            System.out.println("123: " + sum);
         }
         // 关闭输入
         scanner.close();
