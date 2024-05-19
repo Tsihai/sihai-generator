@@ -1,37 +1,22 @@
-package com.sihai.generator;
+package com.sihai.maker.generator.file;
 
 import cn.hutool.core.io.FileUtil;
-import com.sihai.model.MainTemplateConfig;
+import com.sihai.maker.model.DataModel;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.Writer;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
 /**
  * 动态文件生成器
  * @Author sihai
  * @Date 2024/1/11 19:00
  */
-public class DynamicGenerator {
-
-    public static void main(String[] args) throws IOException, TemplateException {
-
-        // 获取模板路径
-        String projectPath = System.getProperty("user.dir");
-        String inputPath = projectPath + File.separator + "src/main/resources/templates/MainTemplate.ftl";
-        String outputPath = projectPath + File.separator + "MainTemplate.java";
-        // 数据模型
-        MainTemplateConfig mainTemplateConfig = new MainTemplateConfig();
-        mainTemplateConfig.setAuthor("sihai");
-        mainTemplateConfig.setLoop(true);
-        mainTemplateConfig.setOutputText("求和结果：");
-        // 生成文件
-        doGenerate(inputPath, outputPath, mainTemplateConfig);
-    }
+public class DynamicFileGenerator {
 
     /**
      * 生成文件
@@ -55,7 +40,7 @@ public class DynamicGenerator {
 
         // 创建模板对象，加载指定模板文件
         String templateName = new File(inputPath).getName();
-        Template template = cfg.getTemplate(templateName);
+        Template template = cfg.getTemplate(templateName, "utf-8");
 
         // 判断文件是否存在
         if (!FileUtil.exist(outputPath)) {
@@ -63,7 +48,7 @@ public class DynamicGenerator {
         }
 
         // 文件生成
-        Writer out = new FileWriter(outputPath);
+        BufferedWriter out = new BufferedWriter(new OutputStreamWriter(Files.newOutputStream(Paths.get(outputPath)), StandardCharsets.UTF_8));
 
         template.process(model, out);
 

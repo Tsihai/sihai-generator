@@ -1,7 +1,7 @@
-package com.sihai.generator;
+package ${basePackage}.generator;
 
 import cn.hutool.core.io.FileUtil;
-import com.sihai.model.MainTemplateConfig;
+import ${basePackage}.model.DataModel;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
@@ -13,25 +13,8 @@ import java.io.Writer;
 
 /**
  * 动态文件生成器
- * @Author sihai
- * @Date 2024/1/11 19:00
  */
 public class DynamicGenerator {
-
-    public static void main(String[] args) throws IOException, TemplateException {
-
-        // 获取模板路径
-        String projectPath = System.getProperty("user.dir");
-        String inputPath = projectPath + File.separator + "src/main/resources/templates/MainTemplate.ftl";
-        String outputPath = projectPath + File.separator + "MainTemplate.java";
-        // 数据模型
-        MainTemplateConfig mainTemplateConfig = new MainTemplateConfig();
-        mainTemplateConfig.setAuthor("sihai");
-        mainTemplateConfig.setLoop(true);
-        mainTemplateConfig.setOutputText("求和结果：");
-        // 生成文件
-        doGenerate(inputPath, outputPath, mainTemplateConfig);
-    }
 
     /**
      * 生成文件
