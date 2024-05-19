@@ -6,8 +6,6 @@
   "author": "sihai",
   "createTime": "2024-5-19",
   "fileConfig": {
-    "inputRootPath": ".source/acm-template-pro",
-    "outputRootPath": "generated",
     "sourceRootPath": "D:/Object/generator/sihai-generator/sihai-generator-demo/acm-template-pro",
     "type": "dir",
     "files": [
