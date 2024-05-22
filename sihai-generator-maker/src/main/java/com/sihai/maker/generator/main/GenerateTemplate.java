@@ -18,7 +18,7 @@ import java.util.List;
 /**
  * 核心生成器
  */
-public class GenerateTemplate {
+public abstract class GenerateTemplate {
 
     public void doGenerate() throws IOException, InterruptedException, TemplateException {
 
@@ -62,6 +62,7 @@ public class GenerateTemplate {
         String inputFilePath = inputResourcePath + File.separator + "templates/pom.xml.ftl";
         String outputFilePath = outputPath + File.separator + "pom.xml";
         DynamicFileGenerator.doGenerate(inputFilePath, outputFilePath, meta);
+
 
         // 构建 jar 包
         JarGenerator.doGenerate(outputPath);
@@ -108,8 +109,9 @@ public class GenerateTemplate {
      * @param meta
      */
     protected void generateFile(String inputResourcePath, String outputBasePackagePath, String template, Meta meta) throws TemplateException, IOException {
+        String templateWithoutJava = template.substring(template.indexOf("/") + 1);
         String inputFilePath = inputResourcePath + File.separator + "templates" + File.separator + template;
-        String outputFilePath = outputBasePackagePath + File.separator + template.replaceAll("\\.ftl$", "");
+        String outputFilePath = outputBasePackagePath + File.separator + templateWithoutJava.replaceAll("\\.ftl$", "");
         DynamicFileGenerator.doGenerate(inputFilePath, outputFilePath, meta);
     }
 
@@ -126,4 +128,5 @@ public class GenerateTemplate {
         FileUtil.copy(new File(shellOutputPath), new File(distOutputPath), true);
         FileUtil.copy(new File(shellOutputPath + ".bat"), new File(distOutputPath), true);
     }
+
 }

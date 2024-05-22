@@ -9,4 +9,10 @@ import java.io.IOException;
  */
 public class MainGenerator extends GenerateTemplate{
 
+    @Override
+    @Deprecated
+    protected void createDistPackage(String outputPath, String jarPath, String shellOutputPath, String distOutputPath) {
+        System.out.println("不生成 dist 文件了");
+    }
+
 }

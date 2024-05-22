@@ -1,13 +1,19 @@
 package com.sihai.maker.meta;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.util.StrUtil;
+import com.sihai.maker.meta.enums.FileConfigValuesEnum;
+import com.sihai.maker.meta.enums.ModelTypeEnum;
 
+import java.io.File;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class MetaValidatorPro {
 
@@ -20,7 +26,8 @@ public class MetaValidatorPro {
     private static final String DEFAULT_CREATE_TIME_FORMAT = "yyyy-MM-dd HH:mm:ss";
     private static final String DEFAULT_FILE_CONFIG_TYPE = "dir";
     private static final String DEFAULT_OUTPUT_ROOT_PATH = "generated";
-    private static final String DEFAULT_INPUT_ROOT_PATH_TEMPLATE = ".source";
+    private static final String DEFAULT_INPUT_ROOT_PATH_TEMPLATE = ".source/";
+    private static final String GROUP_KEY = "group";
 
     /**
      * 验证并填充元信息及默认值
@@ -107,7 +114,9 @@ public class MetaValidatorPro {
     private static void fillFileInfoDefaults(List<Meta.FileConfig.FileInfo> fileInfoList) {
         if (CollUtil.isNotEmpty(fileInfoList)) {
             fileInfoList.forEach(fileInfo -> {
-                validateAndFillFileInfo(fileInfo);
+                if (!GROUP_KEY.equals(fileInfo.getType())){
+                    validateAndFillFileInfo(fileInfo);
+                }
             });
         }
     }
@@ -184,10 +193,22 @@ public class MetaValidatorPro {
             return;
         }
 
-        modelInfoList.forEach(modelInfo -> {
-            validateFieldName(modelInfo);
-            setDefaultTypeIfEmpty(modelInfo);
-        });
+        // 防止并发修改异常，做一次浅拷贝
+        for (Meta.ModelConfig.ModelInfo modelInfo : new ArrayList<>(modelInfoList)) {
+            // 如果 GroupKey 不为空，跳出循环
+            try {
+                if (StrUtil.isNotEmpty(modelInfo.getGroupKey())) {
+                    // 优化字符串拼接性能
+                    modelInfo.setAllArgsStr(buildAllArgsStr(modelInfo));
+                    continue;
+                }
+                validateFieldName(modelInfo);
+                setDefaultTypeIfEmpty(modelInfo);
+            } catch (Exception e) { // 捕获并处理可能的异常，确保方法健壮性
+                // 日志记录或其他错误处理逻辑
+                System.err.println("Error processing model info: " + e.getMessage());
+            }
+        }
     }
 
     /**
@@ -209,8 +230,22 @@ public class MetaValidatorPro {
      */
     private static void setDefaultTypeIfEmpty(Meta.ModelConfig.ModelInfo modelInfo) {
         if (StrUtil.isEmpty(modelInfo.getType())) {
-            modelInfo.setType("String");
+            modelInfo.setType(ModelTypeEnum.STRING.getValue());
         }
+    }
+
+    /**
+     * 生成中间参数字符串
+     * @param modelInfo 模型信息
+     * @return 参数字符串
+     */
+    private static String buildAllArgsStr(Meta.ModelConfig.ModelInfo modelInfo) {
+        // 生成中间参数
+        String allArgsStr = modelInfo.getModels().stream()
+                .map(subModelInfo -> String.format("\"--%s\"", subModelInfo.getFieldName()))
+                .collect(Collectors.joining(", "));
+        modelInfo.setAllArgsStr(allArgsStr);
+        return allArgsStr;
     }
 
 }

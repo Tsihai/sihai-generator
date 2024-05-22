@@ -1,21 +1,17 @@
 package com.sihai.maker.meta.enums;
 
 /**
- * 文件配置默认值枚举
+ * 模型配置默认值枚举
  */
-public enum FileConfigDefaultValuesEnum {
+public enum ModelTypeEnum {
 
-    TYPE("目录","dir"),
-
-    OUTPUT_ROOT_PATH("输出根目录","generated"),
-
-    INPUT_ROOT_PATH_TEMPLATE("输入根路径模板",".source");
+    STRING("模型配置默认类型","String");
 
     private final String text;
 
     private final String value;
 
-    FileConfigDefaultValuesEnum(String text, String value) {
+    ModelTypeEnum(String text, String value) {
         this.text = text;
         this.value = value;
     }

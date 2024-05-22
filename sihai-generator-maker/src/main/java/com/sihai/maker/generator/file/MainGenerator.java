@@ -32,14 +32,4 @@ public class MainGenerator {
         String outputDynamicFilePath = outputPath + File.separator + "acm-template/src/com/sihai/acm/MainTemplate.java.ftl";
         DynamicFileGenerator.doGenerate(inputDynamicFilePath, outputDynamicFilePath, model);
     }
-
-    public static void main(String[] args) throws TemplateException, IOException {
-        // 配置数据模型
-        DataModel dataModel = new DataModel();
-        dataModel.setAuthor("sihai");
-        dataModel.setLoop(false);
-        dataModel.setOutputText("求和结果：");
-        // 生成代码
-        doGenerate(dataModel);
-    }
 }

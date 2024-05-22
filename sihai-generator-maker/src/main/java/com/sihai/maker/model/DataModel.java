@@ -11,17 +11,26 @@ import lombok.Data;
 public class DataModel {
 
     /**
-     * 作者
+     * 是否生成 .gitignore
      */
-    private String author = "sihai";
-
-    /**
-     * 输出信息提示
-     */
-    private String outputText = "sum = ";
+    private boolean needGit = true;
 
     /**
      * 是否循环
      */
     private boolean loop;
+
+    /**
+     * 核心模版
+     */
+    public MainTemplate mainTemplate;
+
+    @Data
+    public class MainTemplate {
+
+        public String author = "sihai";
+
+        public String outputText = "sum = ";
+
+    }
 }
