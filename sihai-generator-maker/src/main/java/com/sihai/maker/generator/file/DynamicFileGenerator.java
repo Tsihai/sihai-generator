@@ -35,10 +35,12 @@ public class DynamicFileGenerator {
         cfg.setDirectoryForTemplateLoading(templateDir);
         // 设置模板文件使用的字符集
         cfg.setDefaultEncoding("UTF-8");
+        // 设置默认生成的数字格式
+        cfg.setNumberFormat("0.######");
 
         // 创建模板对象，加载指定模板文件
         String templateName = new File(inputPath).getName();
-        Template template = cfg.getTemplate(templateName);
+        Template template = cfg.getTemplate(templateName, "utf-8");
 
         // 判断文件是否存在
         if (!FileUtil.exist(outputPath)) {

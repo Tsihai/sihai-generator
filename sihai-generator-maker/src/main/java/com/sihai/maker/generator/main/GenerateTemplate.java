@@ -98,7 +98,7 @@ public abstract class GenerateTemplate {
      * @param destPath
      */
     protected void copySourceFiles(String sourceRootPath, String destPath) {
-        FileUtil.copy(sourceRootPath, destPath, false);
+        FileUtil.copy(sourceRootPath, destPath, true);
     }
 
     /**
