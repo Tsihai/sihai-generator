@@ -1,6 +1,5 @@
 package com.sihai.maker.generator.file;
 
-import com.sihai.maker.model.DataModel;
 import freemarker.template.TemplateException;
 
 import java.io.File;

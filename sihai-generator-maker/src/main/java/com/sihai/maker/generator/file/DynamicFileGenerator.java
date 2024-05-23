@@ -1,7 +1,6 @@
 package com.sihai.maker.generator.file;
 
 import cn.hutool.core.io.FileUtil;
-import com.sihai.maker.model.DataModel;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;

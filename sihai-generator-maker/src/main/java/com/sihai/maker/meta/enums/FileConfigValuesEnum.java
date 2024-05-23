@@ -11,7 +11,13 @@ public enum FileConfigValuesEnum {
 
     GROUP("文件组", "group"),
 
-    INPUT_ROOT_PATH_TEMPLATE("输入根路径模板",".source");
+    INPUT_ROOT_PATH_TEMPLATE("输入根路径模板",".source"),
+
+    DYNAMIC("动态", "dynamic"),
+
+    STATIC("静态", "static"),
+
+    FILE("文件类型", "file");
 
     private final String text;
 

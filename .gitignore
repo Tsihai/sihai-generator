@@ -1,5 +1,6 @@
 ### Custom template
 .idea
+.temp
 generated
 sihai-generator.iml
 sihai-generator-basic.iml
