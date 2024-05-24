@@ -299,7 +299,7 @@ public class TemplateMaker {
         modelInfoConfig.setFieldName("url");
         modelInfoConfig.setType("String");
         modelInfoConfig.setDefaultValue("jdbc:mysql://localhost:3306/my_db");
-        modelInfoConfig.setReplaceText("jdbc:mysql://localhost:3306/sihai_db");
+        modelInfoConfig.setReplaceText("jdbc:mysql://localhost:3306/my_db");
 
         // 模型配置2
         TemplateMakerModelConfig.ModelInfoConfig modelInfoConfig2 = new TemplateMakerModelConfig.ModelInfoConfig();
