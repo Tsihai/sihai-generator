@@ -1,0 +1,8 @@
+{
+  "id": 1,
+  "meta": {
+    "name": "acm-template-generator",
+    "description": "ACM 示例模版生成器"
+  },
+  "originProjectPath": "../../../sihai-generator-demo/springboot-init"
+}

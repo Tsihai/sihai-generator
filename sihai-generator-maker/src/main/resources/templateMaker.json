@@ -1,0 +1,24 @@
+{
+  "meta": {
+    "name": "acm-template-generator",
+    "description": "ACM 示例模版生成器"
+  },
+  "originProjectPath": "../../../sihai-generator-demo/springboot-init",
+  "fileConfig": {
+    "files": [
+      {
+        "path": "src/main/java/com/sihai/springbootinit/common"
+      }
+    ]
+  },
+  "modelConfig": {
+    "models": [
+      {
+        "fieldName": "className",
+        "type": "String",
+        "defaultValue": true,
+        "replaceText": "Base"
+      }
+    ]
+  }
+}
