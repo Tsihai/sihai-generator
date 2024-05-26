@@ -13,6 +13,7 @@ import com.sihai.maker.template.Filter.FileFilter;
 import com.sihai.maker.template.model.TemplateMakerConfig;
 import com.sihai.maker.template.model.TemplateMakerFileConfig;
 import com.sihai.maker.template.model.TemplateMakerModelConfig;
+import com.sihai.maker.template.model.TemplateMakerOutputConfig;
 
 import java.io.File;
 import java.util.*;
@@ -29,8 +30,9 @@ public class TemplateMakerPro {
         String originProjectPath = templateMakerConfig.getOriginProjectPath();
         TemplateMakerFileConfig templateMakerFileConfig = templateMakerConfig.getFileConfig();
         TemplateMakerModelConfig templateMakerModelConfig = templateMakerConfig.getModelConfig();
+        TemplateMakerOutputConfig templateMakerOutputConfig = templateMakerConfig.getOutputConfig();
 
-        return makeTemplate(meta, originProjectPath, templateMakerFileConfig, templateMakerModelConfig, id);
+        return makeTemplate(meta, originProjectPath, templateMakerFileConfig, templateMakerModelConfig, templateMakerOutputConfig, id);
     }
 
     /**
@@ -43,7 +45,10 @@ public class TemplateMakerPro {
      * @param id
      * @return
      */
-    public static long makeTemplate(Meta newMeta, String originProjectPath, TemplateMakerFileConfig templateMakerFileConfig, TemplateMakerModelConfig templateMakerModelConfig, Long id) {
+    public static long makeTemplate(Meta newMeta, String originProjectPath,
+                                    TemplateMakerFileConfig templateMakerFileConfig,
+                                    TemplateMakerModelConfig templateMakerModelConfig,
+                                    TemplateMakerOutputConfig templateMakerOutputConfig, Long id) {
         id = initId(id);
 
         // 创建临时工作空间
@@ -59,7 +64,10 @@ public class TemplateMakerPro {
         List<Meta.ModelConfig.ModelInfo> newModelInfoList = processModelGroup(templateMakerModelConfig, convertModelInfoList(templateMakerModelConfig));
 
         // 生成配置文件
-        Result result = generateConfig(newMeta, sourceRootPath, newFileInfoList, newModelInfoList, templatePath);
+        Result result = generateConfig(newMeta, sourceRootPath, newFileInfoList, newModelInfoList, templatePath, templateMakerOutputConfig);
+
+        // 分组去重
+//        removeGroupFilesFromRootIfNecessary(newMeta, templateMakerOutputConfig);
 
         // 输出元信息文件
         FileUtil.writeUtf8String(JSONUtil.toJsonPrettyStr(result.newMeta), result.metaOutputPath);
@@ -194,6 +202,7 @@ public class TemplateMakerPro {
         TemplateMakerModelConfig.ModelGroupConfig modelGroupConfig = templateMakerModelConfig.getModelGroupConfig();
 
         if (modelGroupConfig != null) {
+            // 复制变量
             Meta.ModelConfig.ModelInfo groupModelInfo = new Meta.ModelConfig.ModelInfo();
             BeanUtil.copyProperties(modelGroupConfig, groupModelInfo);
 
@@ -250,6 +259,7 @@ public class TemplateMakerPro {
             String groupName = fileGroupConfig.getGroupName();
 
             Meta.FileConfig.FileInfo groupFileInfo = new Meta.FileConfig.FileInfo();
+            groupFileInfo.setType(FileConfigValuesEnum.GROUP.getValue());
             groupFileInfo.setCondition(condition);
             groupFileInfo.setGroupKey(groupKey);
             groupFileInfo.setGroupName(groupName);
@@ -258,8 +268,6 @@ public class TemplateMakerPro {
             newFileInfoList = new ArrayList<>();
             newFileInfoList.add(groupFileInfo);
         }
-        System.out.println("fileGroupConfig:" + fileGroupConfig);
-        System.out.println("fileConfigInfoList:" + fileConfigInfoList);
         return newFileInfoList;
     }
 
@@ -272,7 +280,10 @@ public class TemplateMakerPro {
      * @param newModelInfoList
      * @return
      */
-    private static Result generateConfig(Meta newMeta, String sourceRootPath, List<Meta.FileConfig.FileInfo> newFileInfoList, List<Meta.ModelConfig.ModelInfo> newModelInfoList, String templatePath) {
+    private static Result generateConfig(Meta newMeta, String sourceRootPath,
+                                         List<Meta.FileConfig.FileInfo> newFileInfoList,
+                                         List<Meta.ModelConfig.ModelInfo> newModelInfoList, String templatePath,
+                                         TemplateMakerOutputConfig templateMakerOutputConfig) {
         String metaOutputPath = templatePath + File.separator + "meta.json";
 
         // 判断是否存在元文件，存在则在原文件基础上新增
@@ -296,7 +307,7 @@ public class TemplateMakerPro {
             // 构建配置参数对象
             Meta.FileConfig fileConfig = new Meta.FileConfig();
             newMeta.setFileConfig(fileConfig);
-            fileConfig.setInputRootPath(sourceRootPath);
+            fileConfig.setSourceRootPath(sourceRootPath);
             List<Meta.FileConfig.FileInfo> fileInfoList = new ArrayList<>();
             fileConfig.setFiles(fileInfoList);
             fileInfoList.addAll(newFileInfoList);
@@ -306,6 +317,14 @@ public class TemplateMakerPro {
             List<Meta.ModelConfig.ModelInfo> modelInfoList = new ArrayList<>();
             modelConfig.setModels(modelInfoList);
             modelInfoList.addAll(newModelInfoList);
+        }
+        // 2. 额外的输出配置
+        if (templateMakerOutputConfig != null) {
+            // 文件外层和分组去重
+            if (templateMakerOutputConfig.isRemoveGroupFilesFromRoot()) {
+                List<Meta.FileConfig.FileInfo> fileInfoList = newMeta.getFileConfig().getFiles();
+                newMeta.getFileConfig().setFiles(TemplateMakerUtils.removeGroupFilesFromRoot(fileInfoList));
+            }
         }
         Result result = new Result(newMeta, metaOutputPath);
         return result;
@@ -464,8 +483,26 @@ public class TemplateMakerPro {
         Meta.FileConfig.FileInfo fileInfo = new Meta.FileConfig.FileInfo();
         fileInfo.setInputPath(fileOutputPath);
         fileInfo.setOutputPath(fileInputPath);
+        fileInfo.setCondition(fileInfo.getCondition());
         fileInfo.setType(FileConfigValuesEnum.FILE.getValue());
         fileInfo.setGenerateType(FileConfigValuesEnum.DYNAMIC.getValue());
         return fileInfo;
+    }
+
+    /**
+     * 如果需要移除文件组，则移除
+     * @param newMeta
+     * @param templateMakerOutputConfig
+     */
+    private static void removeGroupFilesFromRootIfNecessary(Meta newMeta, TemplateMakerOutputConfig templateMakerOutputConfig) {
+        if (templateMakerOutputConfig != null) {
+            Meta.FileConfig fileConfig = newMeta.getFileConfig();
+            if (fileConfig != null) {
+                List<Meta.FileConfig.FileInfo> fileInfoList = fileConfig.getFiles();
+                if (fileInfoList != null && !fileInfoList.isEmpty()) {
+                    fileConfig.setFiles(TemplateMakerUtils.removeGroupFilesFromRoot(fileInfoList));
+                }
+            }
+        }
     }
 }

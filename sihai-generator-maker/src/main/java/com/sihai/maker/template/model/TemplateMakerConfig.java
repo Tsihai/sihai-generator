@@ -18,4 +18,6 @@ public class TemplateMakerConfig {
     TemplateMakerModelConfig modelConfig = new TemplateMakerModelConfig();
 
     TemplateMakerFileConfig fileConfig = new TemplateMakerFileConfig();
+
+    TemplateMakerOutputConfig outputConfig = new TemplateMakerOutputConfig();
 }
