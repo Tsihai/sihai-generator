@@ -80,7 +80,7 @@ public abstract class GenerateTemplate {
 
         // 生成精简版产物包
         String distOutputPath = outputPath + "-dist";
-        createDistPackage(outputPath, jarPath, shellOutputPath, distOutputPath);
+        createDistPackage(outputPath, jarPath, shellOutputPath, distOutputPath, sourceRootPath);
 
         System.out.println("生成完毕");
     }
@@ -125,11 +125,12 @@ public abstract class GenerateTemplate {
      * @param shellOutputPath
      * @param distOutputPath
      */
-    protected String createDistPackage(String outputPath, String jarPath, String shellOutputPath, String distOutputPath) {
+    protected String createDistPackage(String outputPath, String jarPath, String shellOutputPath, String distOutputPath, String sourceRootPath) {
         FileUtil.mkdir(distOutputPath + File.separator + "target");
         FileUtil.copy(new File(outputPath, jarPath), new File(distOutputPath, jarPath), true);
         FileUtil.copy(new File(shellOutputPath), new File(distOutputPath), true);
         FileUtil.copy(new File(shellOutputPath + ".bat"), new File(distOutputPath), true);
+        FileUtil.copy(new File(sourceRootPath), new File(distOutputPath), true);
         return distOutputPath;
     }
 

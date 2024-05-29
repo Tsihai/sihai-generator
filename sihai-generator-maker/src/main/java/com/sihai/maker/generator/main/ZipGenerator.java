@@ -6,8 +6,8 @@ package com.sihai.maker.generator.main;
 public class ZipGenerator extends GenerateTemplate {
 
     @Override
-    protected String createDistPackage(String outputPath, String sourceCopyDestPath, String jarPath, String shellOutputFilePath) {
-        String distPath = super.createDistPackage(outputPath, sourceCopyDestPath, jarPath, shellOutputFilePath);
+    protected String createDistPackage(String outputPath, String sourceCopyDestPath, String jarPath, String shellOutputFilePath, String sourceRootPath) {
+        String distPath = super.createDistPackage(outputPath, sourceCopyDestPath, jarPath, shellOutputFilePath, sourceRootPath);
         return super.buildZip(distPath);
     }
 }
