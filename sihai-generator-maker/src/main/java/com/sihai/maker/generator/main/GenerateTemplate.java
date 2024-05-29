@@ -3,6 +3,7 @@ package com.sihai.maker.generator.main;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.io.resource.ClassPathResource;
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.core.util.ZipUtil;
 import com.sihai.maker.generator.JarGenerator;
 import com.sihai.maker.generator.ScriptGenerator;
 import com.sihai.maker.generator.file.DynamicFileGenerator;
@@ -46,6 +47,7 @@ public abstract class GenerateTemplate {
         List<String> templates = Arrays.asList(
                 "java/model/DataModel.java.ftl",
                 "java/cli/command/GenerateCommand.java.ftl",
+                "java/cli/command/JsonGenerateCommand.java.ftl",
                 "java/cli/command/ListCommand.java.ftl",
                 "java/cli/command/ConfigCommand.java.ftl",
                 "java/cli/CommandExecutor.java.ftl",
@@ -53,6 +55,7 @@ public abstract class GenerateTemplate {
                 "java/generator/DynamicGenerator.java.ftl",
                 "java/generator/StaticGenerator.java.ftl",
                 "java/generator/MainGenerator.java.ftl"
+
         );
         for (String template : templates) {
             generateFile(inputResourcePath, outputBasePackagePath, template, meta);
@@ -122,11 +125,24 @@ public abstract class GenerateTemplate {
      * @param shellOutputPath
      * @param distOutputPath
      */
-    protected void createDistPackage(String outputPath, String jarPath, String shellOutputPath, String distOutputPath) {
+    protected String createDistPackage(String outputPath, String jarPath, String shellOutputPath, String distOutputPath) {
         FileUtil.mkdir(distOutputPath + File.separator + "target");
         FileUtil.copy(new File(outputPath, jarPath), new File(distOutputPath, jarPath), true);
         FileUtil.copy(new File(shellOutputPath), new File(distOutputPath), true);
         FileUtil.copy(new File(shellOutputPath + ".bat"), new File(distOutputPath), true);
+        return distOutputPath;
+    }
+
+    /**
+     * 制作压缩包
+     *
+     * @param outputPath
+     * @return 压缩包路径
+     */
+    protected String buildZip(String outputPath) {
+        String zipPath = outputPath + ".zip";
+        ZipUtil.zip(outputPath, zipPath);
+        return zipPath;
     }
 
 }
