@@ -4,6 +4,7 @@ import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.core.util.ZipUtil;
 import cn.hutool.json.JSONUtil;
+import cn.hutool.system.SystemUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.qcloud.cos.model.COSObject;
 import com.qcloud.cos.model.COSObjectInputStream;
@@ -26,13 +27,13 @@ import com.sihai.web.service.GeneratorService;
 import com.sihai.web.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
+import org.springframework.util.FileCopyUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.attribute.PosixFilePermission;
 import java.nio.file.attribute.PosixFilePermissions;
@@ -269,13 +270,13 @@ public class GeneratorController {
     @GetMapping("/download")
     public void download(long id, HttpServletResponse response, HttpServletRequest request) throws IOException {
         if (id <= 0) {
-            throw new BusinessException(ErrorCode.PARAMS_ERROR);
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "无效的ID");
         }
         // 获取登录信息
         User loginUser = userService.getLoginUser(request);
         Generator generator = generatorService.getById(id);
         if (generator == null) {
-            throw new BusinessException(ErrorCode.NOT_FOUND_ERROR);
+            throw new BusinessException(ErrorCode.NOT_FOUND_ERROR, "未找到生成器");
         }
 
         String filepath = generator.getDistPath();
@@ -310,18 +311,17 @@ public class GeneratorController {
 
     /**
      * 使用代码生成器
-     *
      * @param generatorUseRequest
-     * @param request
      * @param response
-     * @return
+     * @param request
+     * @throws IOException
+     * @throws InterruptedException
      */
     @PostMapping("/use")
     public void useGenerator(@RequestBody GeneratorUseRequest generatorUseRequest, HttpServletResponse response, HttpServletRequest request) throws IOException, InterruptedException {
         // 1. 获取用户输入的请求参数
-        if (generatorUseRequest == null || generatorUseRequest.getId() <= 0) {
-            throw new BusinessException(ErrorCode.PARAMS_ERROR);
-        }
+        validateRequest(generatorUseRequest);
+
         Long id = generatorUseRequest.getId();
         Map<String, Object> dataModel = generatorUseRequest.getDataModel();
 
@@ -329,17 +329,66 @@ public class GeneratorController {
         User loginUser = userService.getLoginUser(request);
         log.info("用户 {} 使用了生成器, id = {}", loginUser.getId(), id);
 
+        // 初始化临时目录路径
+        String tempDirPath = String.format("%s/.temp/use/%s", System.getProperty("user.dir"), id);
+
         // 3. 从对象存储中下载生成器的压缩包
+        String zipFilePath = downloadGeneratorZip(id, generatorUseRequest, loginUser);
+
+        // 4. 解压压缩包，得到脚本文件
+        File unzipDistDir = ZipUtil.unzip(zipFilePath);
+        log.info("用户 {} 解压了 {}", loginUser.getId(), zipFilePath);
+
+        // 5. 将用户输入的参数写入到 json 文件中
+        String dataModelJsonPath = writeDataModelJson(dataModel, loginUser, id);
+
+        // 6. 执行脚本文件
+        File scriptFile = findScriptFile(unzipDistDir);
+        addExecutePermission(scriptFile);
+        executeScript(scriptFile, dataModelJsonPath);
+
+        // 7. 压缩生成结果并返回给前端
+        String generatedPath = scriptFile.getParentFile().getAbsolutePath() + "/generated";
+        String zipResultPath = tempDirPath + "/result.zip";
+        File resultZip = ZipUtil.zip(generatedPath, zipResultPath);
+        log.info("用户 {} 压缩了 {}", loginUser.getId(), zipResultPath);
+
+        // 设置响应头
+        setResponseHeader(response, resultZip);
+
+        // 8. 异步删除临时文件
+        deleteTempFilesAsync(tempDirPath);
+    }
+
+    /**
+     * 校验用户输入的请求参数
+     * @param generatorUseRequest
+     */
+    private void validateRequest(GeneratorUseRequest generatorUseRequest) {
+        if (generatorUseRequest == null || generatorUseRequest.getId() <= 0) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
+        }
+    }
+
+    /**
+     * 从对象存储中下载生成器的压缩包
+     * @param id
+     * @param generatorUseRequest
+     * @param loginUser
+     * @return
+     * @throws IOException
+     */
+    private String downloadGeneratorZip(Long id, GeneratorUseRequest generatorUseRequest, User loginUser) throws IOException {
         Generator generator = generatorService.getById(id);
         if (generator == null) {
             throw new BusinessException(ErrorCode.NOT_FOUND_ERROR);
         }
-        // 获取压缩包的存储路径
+
         String filepath = generator.getDistPath();
         if (StrUtil.isBlank(filepath)) {
             throw new BusinessException(ErrorCode.NOT_FOUND_ERROR, "产物包不存在");
         }
-        // 将压缩包下载到独立的工作空间
+
         String projectPath = System.getProperty("user.dir");
         String tempDirPath = String.format("%s/.temp/use/%s", projectPath, id);
         String zipFilePath = tempDirPath + "/dist.zip";
@@ -348,81 +397,124 @@ public class GeneratorController {
         }
         try {
             cosManager.download(filepath, zipFilePath);
+            log.info("用户 {} 下载了 {}", loginUser.getId(), filepath);
         } catch (Exception e) {
             log.error("file download error, filepath = {}", filepath, e);
             throw new BusinessException(ErrorCode.SYSTEM_ERROR, "生成器下载失败");
         }
 
-        // 4. 解压压缩包，得到脚本文件
-        File unzipDistDir = ZipUtil.unzip(zipFilePath);
+        return zipFilePath;
+    }
 
-        // 5. 将用户输入的参数写入到 json 文件中
+    /**
+     * 将用户输入的参数写入到 json 文件中
+     * @param dataModel
+     * @param loginUser
+     * @param id
+     * @return
+     */
+    private String writeDataModelJson(Map<String, Object> dataModel, User loginUser, Long id) {
+        String tempDirPath = String.format("%s/.temp/use/%s", System.getProperty("user.dir"), id);
         String dataModelJsonPath = tempDirPath + "/dataModel.json";
         String jsonStr = JSONUtil.toJsonStr(dataModel);
         FileUtil.writeUtf8String(jsonStr, dataModelJsonPath);
+        log.info("用户 {} 写入了 {}", loginUser.getId(), dataModelJsonPath);
+        return dataModelJsonPath;
+    }
 
-        // 6. 执行脚本文件
-        // 获取脚本文件路径
-        File scriptFile = FileUtil.loopFiles(unzipDistDir, 2, null)
+    /**
+     * 找到脚本文件
+     * @param unzipDistDir
+     * @return
+     */
+    private File findScriptFile(File unzipDistDir) {
+        return FileUtil.loopFiles(unzipDistDir, 2, null)
                 .stream()
                 // 必须是文件
                 .filter(file -> file.isFile() && file.getName().endsWith(".bat"))
                 .findFirst()
-                .orElseThrow(RuntimeException::new);
-        // 添加可执行权限
-//        try {
-//            Set<PosixFilePermission> permissions = PosixFilePermissions.fromString("rwxrwxrwx");
-//            Files.setPosixFilePermissions(scriptFile.toPath(), permissions);
-//        } catch (Exception e) {
-//            log.error("设置脚本文件权限失败", e);
-//            throw new BusinessException(ErrorCode.SYSTEM_ERROR, "设置脚本文件权限失败");
-//        }
-        // 构造命令
-        File scriptFilePath = scriptFile.getParentFile();
+                .orElseThrow(() -> new RuntimeException("找不到 .bat 脚本文件"));
+    }
+
+    /**
+     * 为脚本文件添加执行权限
+     * @param scriptFile
+     */
+    private void addExecutePermission(File scriptFile) {
+        if (!SystemUtil.getOsInfo().isWindows()) {
+            try {
+                Set<PosixFilePermission> permissions = PosixFilePermissions.fromString("rwxrwxrwx");
+                Files.setPosixFilePermissions(scriptFile.toPath(), permissions);
+            } catch (Exception e) {
+                log.error("设置脚本文件权限失败", e);
+                throw new BusinessException(ErrorCode.SYSTEM_ERROR, "设置脚本文件权限失败");
+            }
+        } else {
+            log.info("当前系统为Windows，跳过设置脚本执行权限");
+        }
+    }
+
+    /**
+     * 执行脚本文件
+     * @param scriptFile
+     * @param dataModelJsonPath
+     * @throws IOException
+     * @throws InterruptedException
+     */
+    private void executeScript(File scriptFile, String dataModelJsonPath) throws IOException, InterruptedException {
         String scriptAbsolutePath = scriptFile.getAbsolutePath().replace("\\", "/");
-        String[] commands = new String[] {scriptAbsolutePath, "json-generator", "--file=" + dataModelJsonPath};
+        String[] commands = {scriptAbsolutePath, "json-generator", "--file=" + dataModelJsonPath};
         ProcessBuilder processBuilder = new ProcessBuilder(commands);
-        processBuilder.directory(scriptFilePath);
+        processBuilder.directory(scriptFile.getParentFile());
+
         try {
             Process process = processBuilder.start();
-            // 读取命令输出
-            InputStream inputStream = process.getInputStream();
-            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
-            String line;
-            while ((line = bufferedReader.readLine()) != null) {
-                log.info(line);
+            try (BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
+                String line;
+                while ((line = bufferedReader.readLine()) != null) {
+                    log.info(line);
+                }
             }
-            // 等待命令执行完成
+
             int exitCode = process.waitFor();
             if (exitCode != 0) {
                 log.error("命令执行失败，结束码：" + exitCode);
                 throw new BusinessException(ErrorCode.SYSTEM_ERROR, "命令执行失败");
             }
-            System.out.println("命令执行结束，结束码：" + exitCode);
-        } catch (Exception e) {
+            log.info("命令执行结束，结束码：{}", exitCode);
+        } catch (IOException | InterruptedException e) {
             log.error("执行生成器脚本命令失败", e);
             throw new BusinessException(ErrorCode.SYSTEM_ERROR, "执行生成器脚本命令失败");
         }
-
-        // 7. 压缩得到的生成结果，返回给前端
-        String generatedPath = scriptFilePath.getAbsolutePath() + "/generated";
-        String zipResultPath = tempDirPath + "/result.zip";
-        File resultZip = ZipUtil.zip(generatedPath, zipResultPath);
-
-        // 设置响应头
-        response.setContentType("application/octet-stream;charset=UTF-8");
-        response.setHeader("Content-Disposition", "attachment; filename=result.zip");
-        Files.copy(resultZip.toPath(), response.getOutputStream());
-
-//        // 8. 删除临时文件
-//        CompletableFuture.runAsync(() -> {
-//            try {
-//                FileUtil.del(tempDirPath);
-//            } catch (Exception e) {
-//                log.error("删除临时文件失败", e);
-//            }
-//        });
     }
 
+    /**
+     * 设置文件响应头
+     * @param response
+     * @param file
+     * @throws IOException
+     */
+    private void setResponseHeader(HttpServletResponse response, File file) throws IOException {
+        response.setContentType("application/octet-stream;charset=UTF-8");
+        response.setHeader("Content-Disposition", "attachment; filename=result.zip");
+        try (InputStream inputStream = Files.newInputStream(file.toPath())) {
+            FileCopyUtils.copy(inputStream, response.getOutputStream());
+        }
+    }
+
+    /**
+     * 异步删除临时文件
+     * @param tempDirPath
+     */
+    private void deleteTempFilesAsync(String tempDirPath) {
+        CompletableFuture.runAsync(() -> {
+            try {
+                FileUtil.del(tempDirPath);
+                log.info("删除临时文件成功");
+            } catch (Exception e) {
+                log.error("删除临时文件失败", e);
+            }
+        });
+    }
 
 }
