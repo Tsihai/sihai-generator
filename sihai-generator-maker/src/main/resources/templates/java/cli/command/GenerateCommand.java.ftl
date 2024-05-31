@@ -39,7 +39,7 @@ public class GenerateCommand implements Callable<Integer> {
      */
     static DataModel.${modelInfo.type} ${modelInfo.groupKey} = new DataModel.${modelInfo.type}();
 
-    @Command(name = "${modelInfo.groupName}", description = "${modelInfo.description}")
+    @Command(name = "${modelInfo.groupKey}")
     @Data
     public static class ${modelInfo.type}Command implements Runnable {
 

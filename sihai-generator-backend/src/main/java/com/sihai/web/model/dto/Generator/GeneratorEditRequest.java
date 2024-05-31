@@ -1,6 +1,6 @@
 package com.sihai.web.model.dto.Generator;
 
-import com.sihai.web.meta.Meta;
+import com.sihai.maker.meta.Meta;
 import lombok.Data;
 
 import java.io.Serializable;

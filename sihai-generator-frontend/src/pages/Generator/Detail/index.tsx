@@ -104,7 +104,7 @@ const GeneratorDetailPage: React.FC = () => {
    * 判断编辑按钮显示
    */
   const editButton = my && (
-    <Link to={`/generator/update?id={data.id}`}>
+    <Link to={`/generator/update?id=${data.id}`}>
       <Button icon={<EditOutlined />}>编辑</Button>
     </Link>
   )
@@ -127,15 +127,17 @@ const GeneratorDetailPage: React.FC = () => {
             <Typography.Paragraph type={"secondary"}>版本: {data.version}</Typography.Paragraph>
             <Typography.Paragraph type={"secondary"}>作者: {data.author}</Typography.Paragraph>
             <div style={{marginBottom: 24}}/>
-            <Space size={"middle"}>
-              <Button type={"primary"}>立即使用</Button>
+            <Space size="middle">
+              <Link to={`/generator/use/${data.id}`}>
+                <Button type="primary">立即使用</Button>
+              </Link>
               {downloadButton}
               {editButton}
             </Space>
           </Col>
           {/*右侧--图片*/}
           <Col flex={"360px"} style={{margin: 15, marginRight: 20}}>
-            <Image src={data.picture}/>
+            <Image src={data.picture} style={{width: 360, height: 360}} />
           </Col>
         </Row>
       </Card>

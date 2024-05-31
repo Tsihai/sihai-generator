@@ -1,7 +1,7 @@
 package com.sihai.web.model.vo;
 
 import cn.hutool.json.JSONUtil;
-import com.sihai.web.meta.Meta;
+import com.sihai.maker.meta.Meta;
 import com.sihai.web.model.entity.Generator;
 import lombok.Data;
 import org.springframework.beans.BeanUtils;

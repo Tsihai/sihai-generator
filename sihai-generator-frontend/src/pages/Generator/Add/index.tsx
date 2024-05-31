@@ -13,6 +13,7 @@ import {
 import {useSearchParams} from "@@/exports";
 import {COS_HOST} from "@/constants";
 import { history } from '@umijs/max';
+import ModelConfigForm from "@/pages/Generator/Add/components/ModelConfigForm";
 
 /**
  * 生成器制作页面
@@ -27,6 +28,9 @@ const GeneratorAddPage: React.FC = () => {
   const [oldData, setOldData] = useState<API.GeneratorEditRequest>();
 
   const formRef = useRef<ProFormInstance>();
+
+  // 记录表单已填数据
+  const [modelConfig, setModelConfig] = useState<API.ModelConfig>();
 
   /**
    * 加载数据
@@ -194,7 +198,12 @@ const GeneratorAddPage: React.FC = () => {
           <StepsForm.StepForm
             name="modelConfig"
             title="模型配置"
+            onFinish={async (values) => {
+              setModelConfig(values);
+              return true;
+            }}
           >
+            <ModelConfigForm formRef={formRef} oldData={oldData} />
           </StepsForm.StepForm>
           <StepsForm.StepForm
             name="dist"

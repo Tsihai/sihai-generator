@@ -126,11 +126,12 @@ public abstract class GenerateTemplate {
      * @param distOutputPath
      */
     protected String createDistPackage(String outputPath, String jarPath, String shellOutputPath, String distOutputPath, String sourceRootPath) {
+        String sourcePath = outputPath + File.separator + ".source";
         FileUtil.mkdir(distOutputPath + File.separator + "target");
         FileUtil.copy(new File(outputPath, jarPath), new File(distOutputPath, jarPath), true);
         FileUtil.copy(new File(shellOutputPath), new File(distOutputPath), true);
         FileUtil.copy(new File(shellOutputPath + ".bat"), new File(distOutputPath), true);
-        FileUtil.copy(new File(sourceRootPath), new File(distOutputPath), true);
+        FileUtil.copy(new File(sourcePath), new File(distOutputPath), true);
         return distOutputPath;
     }
 

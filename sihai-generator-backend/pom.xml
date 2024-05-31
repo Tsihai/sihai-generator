@@ -110,6 +110,20 @@
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
+
+        <!-- 引入 maker 项目 -->
+        <dependency>
+            <groupId>com.sihai</groupId>
+            <artifactId>sihai-generator-maker</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+
+        <!-- https://freemarker.apache.org/index.html -->
+        <dependency>
+            <groupId>org.freemarker</groupId>
+            <artifactId>freemarker</artifactId>
+            <version>2.3.32</version>
+        </dependency>
     </dependencies>
 
     <build>
