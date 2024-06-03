@@ -14,6 +14,8 @@ import {useSearchParams} from "@@/exports";
 import {COS_HOST} from "@/constants";
 import { history } from '@umijs/max';
 import ModelConfigForm from "@/pages/Generator/Add/components/ModelConfigForm";
+import FileConfigForm from './components/FileConfigForm';
+import GeneratorMaker from './components/GeneratorMaker';
 
 /**
  * 生成器制作页面
@@ -31,6 +33,8 @@ const GeneratorAddPage: React.FC = () => {
 
   // 记录表单已填数据
   const [modelConfig, setModelConfig] = useState<API.ModelConfig>();
+  const [fileConfig, setFileConfig] = useState<API.FileConfig>();
+  const [basicInfo, setBasicInfo] = useState<API.GeneratorEditRequest>();
 
   /**
    * 加载数据
@@ -138,7 +142,7 @@ const GeneratorAddPage: React.FC = () => {
   return (
     <ProCard>
       {(!id || oldData) && (
-        <StepsForm<API.GeneratorAddRequest>
+        <StepsForm<API.GeneratorAddRequest | API.GeneratorEditRequest>
           formRef={formRef}
           formProps={{initialValues: oldData}}
           onFinish={doSubmit}
@@ -146,7 +150,8 @@ const GeneratorAddPage: React.FC = () => {
           <StepsForm.StepForm
             name="base"
             title="基本信息"
-            onFinish={async () => {
+            onFinish={async (values) => {
+              setBasicInfo(values);
               console.log(formRef.current?.getFieldsValue());
               return true;
             }}
@@ -193,7 +198,12 @@ const GeneratorAddPage: React.FC = () => {
           <StepsForm.StepForm
             name="fileConfig"
             title="文件配置"
+            onFinish={async (values) => {
+              setFileConfig(values);
+              return true;
+            }}
           >
+            <FileConfigForm formRef={formRef} oldData={oldData} />
           </StepsForm.StepForm>
           <StepsForm.StepForm
             name="modelConfig"
@@ -209,9 +219,16 @@ const GeneratorAddPage: React.FC = () => {
             name="dist"
             title="生成器文件"
           >
-            <ProFormItem label="产物包含" name="distPath">
+            <ProFormItem label="产物包" name="distPath">
               <FileUploader biz="generator_dist" description="请上传生成器文件压缩包"/>
             </ProFormItem>
+            <GeneratorMaker
+              meta={{
+                ...basicInfo,
+                ...modelConfig,
+                ...fileConfig,
+              }}
+            />
           </StepsForm.StepForm>
         </StepsForm>
       )}
