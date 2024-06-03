@@ -11,7 +11,7 @@ import java.util.Date;
 import java.util.List;
 
 /**
- * 帖子视图
+ * 生成器视图
  */
 @Data
 public class GeneratorVO implements Serializable {

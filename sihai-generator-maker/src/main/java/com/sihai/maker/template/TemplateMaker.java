@@ -1,4 +1,4 @@
-package com.yupi.maker.template;
+package com.sihai.maker.template;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.bean.copier.CopyOptions;
@@ -10,7 +10,6 @@ import cn.hutool.json.JSONUtil;
 import com.sihai.maker.meta.Meta;
 import com.sihai.maker.meta.enums.FileConfigValuesEnum;
 import com.sihai.maker.template.Filter.FileFilter;
-import com.sihai.maker.template.TemplateMakerUtils;
 import com.sihai.maker.template.model.TemplateMakerConfig;
 import com.sihai.maker.template.model.TemplateMakerFileConfig;
 import com.sihai.maker.template.model.TemplateMakerModelConfig;

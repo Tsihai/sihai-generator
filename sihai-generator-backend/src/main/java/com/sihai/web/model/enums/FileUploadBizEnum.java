@@ -17,6 +17,8 @@ public enum FileUploadBizEnum {
 
     GENERATOR_DIST("生成器产物包", "generator_dist"),
 
+    GENERATOR_MAKE_TEMPLATE("生成器制作模板文件", "generator_make_template"),
+
     ;
 
     private final String text;

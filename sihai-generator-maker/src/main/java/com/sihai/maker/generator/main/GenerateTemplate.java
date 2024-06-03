@@ -22,23 +22,27 @@ import java.util.List;
 public abstract class GenerateTemplate {
 
     public void doGenerate() throws IOException, InterruptedException, TemplateException {
-
         Meta meta = MetaManager.getMetaObject();
-        System.out.println(meta);
-
         // 输出的根目录
         String projectPath = System.getProperty("user.dir");
         // 输出的路径
         String outputPath = projectPath + File.separator + "generated" + File.separator + meta.getName();
+        // 执行重写生成代码
+        doGenerate(meta, outputPath);
+    }
+
+    /**
+     * 重改生成代码
+     */
+    public void doGenerate(Meta meta, String outputPath) throws TemplateException, IOException, InterruptedException {
         ensureOutputDirectory(outputPath);
 
         // 将原模版文件复制到生成目录下
         String sourceRootPath = meta.getFileConfig().getSourceRootPath();
         copySourceFiles(sourceRootPath, outputPath + File.separator + ".source");
 
-        // 读取 resources 目录
-        ClassPathResource classPathResource = new ClassPathResource("");
-        String inputResourcePath = classPathResource.getAbsolutePath();
+        // 读取 resources 目录`
+        String inputResourcePath = "";
 
         // Java 包的基础路径
         String outputBasePackagePath = outputPath + File.separator + "src/main/java/" + StrUtil.join("/", StrUtil.split(meta.getBasePackage(), "."));
