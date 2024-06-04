@@ -1,5 +1,5 @@
 import { CloseOutlined } from '@ant-design/icons';
-import { Button, Card, Form, FormListFieldData, Input, Space } from 'antd';
+import {Button, Card, Form, FormListFieldData, Input, Select, Space} from 'antd';
 
 interface Props {
   formRef: any;
