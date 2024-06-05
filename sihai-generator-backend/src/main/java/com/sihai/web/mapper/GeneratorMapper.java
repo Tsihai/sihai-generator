@@ -3,6 +3,9 @@ package com.sihai.web.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.sihai.web.model.entity.Generator;
+import org.apache.ibatis.annotations.Select;
+
+import java.util.List;
 
 /**
  * @author 13169
@@ -11,6 +14,9 @@ import com.sihai.web.model.entity.Generator;
  * @Entity generator.domain.Generator
  */
 public interface GeneratorMapper extends BaseMapper<Generator> {
+
+    @Select("SELECT id, distPath FROM generator where isDelete = 1")
+    List<Generator> listDeletedGenerator();
 
 }
 

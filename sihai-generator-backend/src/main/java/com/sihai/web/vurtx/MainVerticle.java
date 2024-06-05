@@ -33,5 +33,7 @@ public class MainVerticle extends AbstractVerticle {
         Vertx vertx = Vertx.vertx();
         Verticle myVerticle = new MainVerticle();
         vertx.deployVerticle(myVerticle);
+
     }
+
 }
