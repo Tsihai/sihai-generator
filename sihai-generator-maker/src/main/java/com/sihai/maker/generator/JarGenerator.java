@@ -1,5 +1,7 @@
 package com.sihai.maker.generator;
 
+import cn.hutool.system.SystemUtil;
+
 import java.io.*;
 import java.util.Map;
 
@@ -15,12 +17,9 @@ public class JarGenerator {
      * @throws InterruptedException
      */
     public static void doGenerate(String projectDir) throws IOException, InterruptedException {
-
         // 清理之前的构建并打包
         // 注意不同操作系统，执行的命令不同
-        String winMavenCommand = "mvn.cmd clean package -DskipTests=true";
-        String otherMavenCommand = "mvn clean package -DskipTests=true";
-        String mavenCommand = winMavenCommand;
+        String mavenCommand = SystemUtil.getOsInfo().isWindows() ? "mvn.cmd clean package -DskipTests=true" : "mvn clean package -DskipTests=true";
 
         // 这里一定要拆分！
         ProcessBuilder processBuilder = new ProcessBuilder(mavenCommand.split(" "));

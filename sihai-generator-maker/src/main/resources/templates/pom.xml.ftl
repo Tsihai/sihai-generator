@@ -8,6 +8,12 @@
     <artifactId>${name}</artifactId>
     <version>${version}</version>
 
+    <properties>
+        <maven.compiler.source>8</maven.compiler.source>
+        <maven.compiler.target>8</maven.compiler.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+
     <dependencies>
         <!-- picocli -->
         <dependency>

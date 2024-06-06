@@ -398,24 +398,6 @@ public class GeneratorController {
     }
 
     /**
-     * 为脚本文件添加执行权限
-     * @param scriptFile
-     */
-    private void addExecutePermission(File scriptFile) {
-        if (!SystemUtil.getOsInfo().isWindows()) {
-            try {
-                Set<PosixFilePermission> permissions = PosixFilePermissions.fromString("rwxrwxrwx");
-                Files.setPosixFilePermissions(scriptFile.toPath(), permissions);
-            } catch (Exception e) {
-                log.error("设置脚本文件权限失败", e);
-                throw new BusinessException(ErrorCode.SYSTEM_ERROR, "设置脚本文件权限失败");
-            }
-        } else {
-            log.info("当前系统为Windows，跳过设置脚本执行权限");
-        }
-    }
-
-    /**
      * 设置文件响应头
      * @param response
      * @param file
@@ -523,7 +505,7 @@ public class GeneratorController {
         File scriptFile = FileUtil.loopFiles(unzipDistDir, 2, null)
                 .stream()
                 .filter(file -> file.isFile()
-                        && "generator.bat".equals(file.getName()))
+                        && (SystemUtil.getOsInfo().isWindows() ? "generator.bat".equals(file.getName()) : "generator".equals(file.getName())))
                 .findFirst()
                 .orElseThrow(RuntimeException::new);
 
@@ -542,7 +524,9 @@ public class GeneratorController {
         // 构造命令
         File scriptDir = scriptFile.getParentFile();
         // 注意，如果是 mac / linux 系统，要用 "./generator"
-        String scriptAbsolutePath = scriptFile.getAbsolutePath().replace("\\", "/");
+        String scriptAbsolutePath = SystemUtil.getOsInfo().isWindows()
+                ? scriptFile.getAbsolutePath().replace("\\", "/")
+                : scriptFile.getAbsolutePath();
         String[] commands = new String[] {scriptAbsolutePath, "json-generate", "--file=" + dataModelFilePath};
 
         // 这里一定要拆分！

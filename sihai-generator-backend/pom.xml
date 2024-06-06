@@ -111,7 +111,7 @@
         <dependency>
             <groupId>com.sihai</groupId>
             <artifactId>sihai-generator-maker</artifactId>
-            <version>1.0-SNAPSHOT</version>
+            <version>1.0</version>
         </dependency>
 
         <!-- https://freemarker.apache.org/index.html -->

@@ -1,6 +1,7 @@
 HELP.md
 target/
 src/main/resources/application-cos.yml
+src/main/resources/application-prod.yml
 sql/create_table.sql
 !.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
