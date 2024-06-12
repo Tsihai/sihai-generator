@@ -3,7 +3,7 @@ import {
   useGeneratorUsingPost,
 } from '@/services/backend/generatorController';
 import { Link, useModel, useParams } from '@@/exports';
-import { DownloadOutlined } from '@ant-design/icons';
+import {CreditCardOutlined, DownloadOutlined} from '@ant-design/icons';
 import { PageContainer } from '@ant-design/pro-components';
 import {
   Button,
@@ -14,6 +14,7 @@ import {
   Image,
   Input,
   message,
+  Radio,
   Row,
   Space,
   Tag,
@@ -37,6 +38,33 @@ const GeneratorUsePage: React.FC = () => {
   const { currentUser } = initialState ?? {};
 
   const models = data?.modelConfig?.models ?? [];
+
+  /**
+   * 设置初始值
+   * @param models
+   */
+  const modelInitialValues = (models: API.ModelInfo[]) => {
+    let res = {};
+    models?.forEach((mode) => {
+      if (mode.groupKey) {
+        res = {
+          ...res,
+          // @ts-ignore
+          [mode.groupKey]: modelInitialValues(mode.models),
+        };
+      } else {
+        res = {
+          ...res,
+          // @ts-ignore
+          [mode.fieldName]: mode.defaultValue,
+        };
+      }
+    });
+    return res;
+  };
+  let defaultValue = modelInitialValues(models);
+  const [formValues, setFormValues] = useState<any>({ ...defaultValue });
+  const isEmptyObject = (obj: any) => Object.entries(obj).length === 0;
 
   /**
    * 加载数据
@@ -111,6 +139,15 @@ const GeneratorUsePage: React.FC = () => {
     </Button>
   );
 
+  /**
+   * 详情按钮
+   */
+  const detailButton = (
+    <Link to={`/generator/detail/${data.id}`}>
+      <Button icon={<CreditCardOutlined />}>查看详情</Button>
+    </Link>
+  );
+
   return (
     <PageContainer title={<></>} loading={loading}>
       <Card>
@@ -121,8 +158,13 @@ const GeneratorUsePage: React.FC = () => {
               {tagListView(data.tags)}
             </Space>
             <Typography.Paragraph>{data.description}</Typography.Paragraph>
+
             <div style={{ marginBottom: 24 }} />
-            <Form form={form}>
+              <Form
+                form={form}
+                initialValues={defaultValue}
+                onValuesChange={(changedValues, allValues) => setFormValues(allValues)}
+              >
               {models.map((model, index) => {
                 // 是分组
                 if (model.groupKey) {
@@ -160,18 +202,28 @@ const GeneratorUsePage: React.FC = () => {
                   );
                 }
 
-                return (
-                  <Form.Item label={model.fieldName} name={model.fieldName}>
+                return model.type === 'Boolean' ? (
+                  <Form.Item
+                    label={model.description + `(${model.fieldName})`}
+                    name={model.fieldName}>
+                    <Radio.Group>
+                      <Radio value={true}>是</Radio>
+                      <Radio value={false}>否</Radio>
+                    </Radio.Group>
+                  </Form.Item>
+                ) : (
+                  <Form.Item
+                    label={model.description + `(${model.fieldName})`}
+                    name={model.fieldName}
+                  >
                     <Input placeholder={model.description} />
                   </Form.Item>
-                );
+                )
               })}
             </Form>
             <Space size="middle">
               {downloadButton}
-              <Link to={`/generator/detail/${id}`}>
-                <Button>查看详情</Button>
-              </Link>
+              {detailButton}
             </Space>
           </Col>
           <Col flex="320px">

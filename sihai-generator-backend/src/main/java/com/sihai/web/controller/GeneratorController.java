@@ -272,8 +272,6 @@ public class GeneratorController {
     }
 
 
-
-
     // endregion
 
     /**
@@ -375,6 +373,7 @@ public class GeneratorController {
 
     /**
      * 校验用户输入的请求参数
+     *
      * @param generatorUseRequest
      */
     private void validateRequest(GeneratorUseRequest generatorUseRequest) {
@@ -385,6 +384,7 @@ public class GeneratorController {
 
     /**
      * 找到脚本文件
+     *
      * @param unzipDistDir
      * @return
      */
@@ -399,6 +399,7 @@ public class GeneratorController {
 
     /**
      * 设置文件响应头
+     *
      * @param response
      * @param file
      * @throws IOException
@@ -417,6 +418,7 @@ public class GeneratorController {
 
     /**
      * 异步删除临时文件
+     *
      * @param tempDirPath
      */
     private void deleteTempFilesAsync(String tempDirPath) {
@@ -433,6 +435,7 @@ public class GeneratorController {
 
     /**
      * 使用代码生成器
+     *
      * @param generatorUseRequest
      * @param request
      * @param response
@@ -469,35 +472,23 @@ public class GeneratorController {
             FileUtil.touch(zipFilePath);
         }
 
-        // 计算耗时
-        StopWatch stopWatch = new StopWatch();
-        stopWatch.start();
+
         try {
             cosManager.download(distPath, zipFilePath);
             log.info("用户 {} 下载了 {}", loginUser.getId(), distPath);
         } catch (Exception e) {
             throw new BusinessException(ErrorCode.SYSTEM_ERROR, "生成器下载失败");
         }
-        stopWatch.stop();
-        log.info("下载耗时 {} 毫秒", stopWatch.getLastTaskTimeMillis());
 
         // 解压压缩包，得到脚本文件
-        stopWatch = new StopWatch();
-        stopWatch.start();
         File unzipDistDir = ZipUtil.unzip(zipFilePath);
         log.info("用户 {} 解压了 {}", loginUser.getId(), zipFilePath);
-        stopWatch.stop();
-        log.info("解压耗时 {} 毫秒", stopWatch.getLastTaskTimeMillis());
 
         // 将用户输入的参数写到 json 文件中
-        stopWatch = new StopWatch();
-        stopWatch.start();
         String dataModelFilePath = tempDirPath + "/dataModel.json";
         String jsonStr = JSONUtil.toJsonStr(dataModel);
         FileUtil.writeUtf8String(jsonStr, dataModelFilePath);
         log.info("用户 {} 写入了 {}", loginUser.getId(), dataModelFilePath);
-        stopWatch.stop();
-        log.info("写入数据文件耗时 {} 毫秒", stopWatch.getLastTaskTimeMillis());
 
         // 执行脚本
         // 找到脚本文件所在路径
@@ -527,15 +518,13 @@ public class GeneratorController {
         String scriptAbsolutePath = SystemUtil.getOsInfo().isWindows()
                 ? scriptFile.getAbsolutePath().replace("\\", "/")
                 : scriptFile.getAbsolutePath();
-        String[] commands = new String[] {scriptAbsolutePath, "json-generate", "--file=" + dataModelFilePath};
+        String[] commands = new String[]{scriptAbsolutePath, "json-generate", "--file=" + dataModelFilePath};
 
         // 这里一定要拆分！
         ProcessBuilder processBuilder = new ProcessBuilder(commands);
         processBuilder.directory(scriptDir);
 
         try {
-            stopWatch = new StopWatch();
-            stopWatch.start();
             Process process = processBuilder.start();
 
             // 读取命令的输出
@@ -548,8 +537,6 @@ public class GeneratorController {
 
             // 等待命令执行完成
             int exitCode = process.waitFor();
-            stopWatch.stop();
-            log.info("命令执行耗时 {} 毫秒", stopWatch.getLastTaskTimeMillis());
             System.out.println("命令执行结束，退出码：" + exitCode);
         } catch (Exception e) {
             e.printStackTrace();
@@ -557,14 +544,14 @@ public class GeneratorController {
         }
 
         // 压缩得到的生成结果，返回给前端
-        stopWatch = new StopWatch();
-        stopWatch.start();
-        String generatedPath = scriptFile.getParentFile().getAbsolutePath() + "/generated";
-        String zipResultPath = tempDirPath + "/result.zip";
+        String generatedPath = SystemUtil.getOsInfo().isWindows()
+                ? scriptFile.getParentFile().getAbsolutePath().replace("\\", "/") + "/generated"
+                : scriptFile.getParentFile().getAbsolutePath() + "/generated";
+        String zipResultPath = SystemUtil.getOsInfo().isWindows()
+                ? tempDirPath.replace("\\", "/") + "/result.zip"
+                : tempDirPath + "/result.zip";
         File resultZip = ZipUtil.zip(generatedPath, zipResultPath);
         log.info("用户 {} 压缩了 {}", loginUser.getId(), zipResultPath);
-        stopWatch.stop();
-        log.info("压缩生成结果耗时 {} 毫秒", stopWatch.getLastTaskTimeMillis());
 
         // 设置响应头
         setResponseHeader(response, resultZip);
@@ -575,6 +562,7 @@ public class GeneratorController {
 
     /**
      * 制作代码生成器
+     *
      * @param generatorMakeRequest
      * @param request
      * @param response

@@ -1,0 +1,327 @@
+{
+  "files": [
+    {
+      "type": "group",
+      "condition": "needPost",
+      "groupKey": "post",
+      "groupName": "帖子文件组",
+      "files": [
+        {
+          "inputPath": "src/main/java/com/sihai/springbootinit/model/entity/Post.java.ftl",
+          "outputPath": "src/main/java/com/sihai/springbootinit/model/entity/Post.java",
+          "type": "file",
+          "generateType": "dynamic"
+        },
+        {
+          "inputPath": "src/main/java/com/sihai/springbootinit/mapper/PostMapper.java.ftl",
+          "outputPath": "src/main/java/com/sihai/springbootinit/mapper/PostMapper.java",
+          "type": "file",
+          "generateType": "dynamic"
+        },
+        {
+          "inputPath": "src/main/java/com/sihai/springbootinit/model/dto/post/PostAddRequest.java.ftl",
+          "outputPath": "src/main/java/com/sihai/springbootinit/model/dto/post/PostAddRequest.java",
+          "type": "file",
+          "generateType": "dynamic"
+        },
+        {
+          "inputPath": "src/main/java/com/sihai/springbootinit/model/dto/post/PostUpdateRequest.java.ftl",
+          "outputPath": "src/main/java/com/sihai/springbootinit/model/dto/post/PostUpdateRequest.java",
+          "type": "file",
+          "generateType": "dynamic"
+        },
+        {
+          "inputPath": "src/main/java/com/sihai/springbootinit/service/PostService.java.ftl",
+          "outputPath": "src/main/java/com/sihai/springbootinit/service/PostService.java",
+          "type": "file",
+          "generateType": "dynamic"
+        },
+        {
+          "inputPath": "src/main/resources/mapper/PostMapper.xml.ftl",
+          "outputPath": "src/main/resources/mapper/PostMapper.xml",
+          "type": "file",
+          "generateType": "dynamic"
+        },
+        {
+          "inputPath": "src/main/java/com/sihai/springbootinit/service/impl/PostServiceImpl.java.ftl",
+          "outputPath": "src/main/java/com/sihai/springbootinit/service/impl/PostServiceImpl.java",
+          "type": "file",
+          "generateType": "dynamic"
+        },
+        {
+          "inputPath": "src/main/java/com/sihai/springbootinit/controller/PostController.java.ftl",
+          "outputPath": "src/main/java/com/sihai/springbootinit/controller/PostController.java",
+          "type": "file",
+          "generateType": "dynamic"
+        },
+        {
+          "inputPath": "src/main/java/com/sihai/springbootinit/model/dto/post/PostQueryRequest.java.ftl",
+          "outputPath": "src/main/java/com/sihai/springbootinit/model/dto/post/PostQueryRequest.java",
+          "type": "file",
+          "generateType": "dynamic"
+        }
+      ]
+    },
+    {
+      "inputPath": "src/main/java/com/sihai/springbootinit/model/dto/post/PostEsDTO.java.ftl",
+      "outputPath": "src/main/java/com/sihai/springbootinit/model/dto/post/PostEsDTO.java",
+      "type": "file",
+      "generateType": "dynamic",
+      "condition": "needPost && needEs"
+    },
+    {
+      "inputPath": "src/main/java/com/sihai/springbootinit/common/ResultUtils.java.ftl",
+      "outputPath": "src/main/java/com/sihai/springbootinit/common/ResultUtils.java",
+      "type": "file",
+      "generateType": "dynamic"
+    },
+    {
+      "inputPath": "src/main/java/com/sihai/springbootinit/constant/UserConstant.java.ftl",
+      "outputPath": "src/main/java/com/sihai/springbootinit/constant/UserConstant.java",
+      "type": "file",
+      "generateType": "dynamic"
+    },
+    {
+      "inputPath": ".gitignore",
+      "outputPath": ".gitignore",
+      "type": "file",
+      "generateType": "static"
+    },
+    {
+      "inputPath": "src/main/java/com/sihai/springbootinit/exception/BusinessException.java.ftl",
+      "outputPath": "src/main/java/com/sihai/springbootinit/exception/BusinessException.java",
+      "type": "file",
+      "generateType": "dynamic"
+    },
+    {
+      "inputPath": "src/main/java/com/sihai/springbootinit/model/dto/user/UserLoginRequest.java.ftl",
+      "outputPath": "src/main/java/com/sihai/springbootinit/model/dto/user/UserLoginRequest.java",
+      "type": "file",
+      "generateType": "dynamic"
+    },
+    {
+      "inputPath": "src/main/java/com/sihai/springbootinit/exception/ThrowUtils.java.ftl",
+      "outputPath": "src/main/java/com/sihai/springbootinit/exception/ThrowUtils.java",
+      "type": "file",
+      "generateType": "dynamic"
+    },
+    {
+      "inputPath": ".idea/encodings.xml",
+      "outputPath": ".idea/encodings.xml",
+      "type": "file",
+      "generateType": "static"
+    },
+    {
+      "inputPath": "src/main/java/com/sihai/springbootinit/common/BaseResponse.java.ftl",
+      "outputPath": "src/main/java/com/sihai/springbootinit/common/BaseResponse.java",
+      "type": "file",
+      "generateType": "dynamic"
+    },
+    {
+      "inputPath": "src/main/java/com/sihai/springbootinit/model/dto/user/UserAddRequest.java.ftl",
+      "outputPath": "src/main/java/com/sihai/springbootinit/model/dto/user/UserAddRequest.java",
+      "type": "file",
+      "generateType": "dynamic"
+    },
+    {
+      "inputPath": "pom.xml.ftl",
+      "outputPath": "pom.xml",
+      "type": "file",
+      "generateType": "dynamic"
+    },
+    {
+      "inputPath": "src/main/java/com/sihai/springbootinit/mapper/UserMapper.java.ftl",
+      "outputPath": "src/main/java/com/sihai/springbootinit/mapper/UserMapper.java",
+      "type": "file",
+      "generateType": "dynamic"
+    },
+    {
+      "inputPath": "src/main/java/com/sihai/springbootinit/MainApplication.java.ftl",
+      "outputPath": "src/main/java/com/sihai/springbootinit/MainApplication.java",
+      "type": "file",
+      "generateType": "dynamic"
+    },
+    {
+      "inputPath": "src/main/resources/mapper/UserMapper.xml.ftl",
+      "outputPath": "src/main/resources/mapper/UserMapper.xml",
+      "type": "file",
+      "generateType": "dynamic"
+    },
+    {
+      "inputPath": ".idea/misc.xml",
+      "outputPath": ".idea/misc.xml",
+      "type": "file",
+      "generateType": "static"
+    },
+    {
+      "inputPath": "src/main/java/com/sihai/springbootinit/model/enums/UserRoleEnum.java.ftl",
+      "outputPath": "src/main/java/com/sihai/springbootinit/model/enums/UserRoleEnum.java",
+      "type": "file",
+      "generateType": "dynamic"
+    },
+    {
+      "inputPath": ".idea/vcs.xml",
+      "outputPath": ".idea/vcs.xml",
+      "type": "file",
+      "generateType": "static"
+    },
+    {
+      "inputPath": "src/test/.DS_Store",
+      "outputPath": "src/test/.DS_Store",
+      "type": "file",
+      "generateType": "static"
+    },
+    {
+      "inputPath": "src/main/java/com/sihai/springbootinit/config/CorsConfig.java.ftl",
+      "outputPath": "src/main/java/com/sihai/springbootinit/config/CorsConfig.java",
+      "type": "file",
+      "generateType": "dynamic",
+      "condition": "needCors"
+    },
+    {
+      "inputPath": "src/main/java/com/sihai/springbootinit/model/dto/user/UserQueryRequest.java.ftl",
+      "outputPath": "src/main/java/com/sihai/springbootinit/model/dto/user/UserQueryRequest.java",
+      "type": "file",
+      "generateType": "dynamic"
+    },
+    {
+      "inputPath": ".idea/workspace.xml.ftl",
+      "outputPath": ".idea/workspace.xml",
+      "type": "file",
+      "generateType": "dynamic"
+    },
+    {
+      "inputPath": "src/main/java/com/sihai/springbootinit/service/UserService.java.ftl",
+      "outputPath": "src/main/java/com/sihai/springbootinit/service/UserService.java",
+      "type": "file",
+      "generateType": "dynamic"
+    },
+    {
+      "inputPath": "src/main/java/com/sihai/springbootinit/exception/GlobalExceptionHandler.java.ftl",
+      "outputPath": "src/main/java/com/sihai/springbootinit/exception/GlobalExceptionHandler.java",
+      "type": "file",
+      "generateType": "dynamic"
+    },
+    {
+      "inputPath": "src/main/java/com/sihai/springbootinit/config/MyBatisPlusConfig.java.ftl",
+      "outputPath": "src/main/java/com/sihai/springbootinit/config/MyBatisPlusConfig.java",
+      "type": "file",
+      "generateType": "dynamic"
+    },
+    {
+      "inputPath": ".DS_Store",
+      "outputPath": ".DS_Store",
+      "type": "file",
+      "generateType": "static"
+    },
+    {
+      "inputPath": "src/.DS_Store",
+      "outputPath": "src/.DS_Store",
+      "type": "file",
+      "generateType": "static"
+    },
+    {
+      "inputPath": "pom.xml.zip",
+      "outputPath": "pom.xml.zip",
+      "type": "file",
+      "generateType": "static"
+    },
+    {
+      "inputPath": "src/main/java/com/sihai/springbootinit/config/Knife4jConfig.java.ftl",
+      "outputPath": "src/main/java/com/sihai/springbootinit/config/Knife4jConfig.java",
+      "type": "file",
+      "generateType": "dynamic",
+      "condition": "needDocs"
+    },
+    {
+      "inputPath": ".idea/jarRepositories.xml",
+      "outputPath": ".idea/jarRepositories.xml",
+      "type": "file",
+      "generateType": "static"
+    },
+    {
+      "inputPath": "src/main/java/com/sihai/springbootinit/model/entity/User.java.ftl",
+      "outputPath": "src/main/java/com/sihai/springbootinit/model/entity/User.java",
+      "type": "file",
+      "generateType": "dynamic"
+    },
+    {
+      "inputPath": "src/main/java/com/sihai/springbootinit/model/dto/user/UserRegisterRequest.java.ftl",
+      "outputPath": "src/main/java/com/sihai/springbootinit/model/dto/user/UserRegisterRequest.java",
+      "type": "file",
+      "generateType": "dynamic"
+    },
+    {
+      "inputPath": "src/main/java/com/sihai/springbootinit/config/JsonConfig.java.ftl",
+      "outputPath": "src/main/java/com/sihai/springbootinit/config/JsonConfig.java",
+      "type": "file",
+      "generateType": "dynamic"
+    },
+    {
+      "inputPath": "src/main/java/com/sihai/springbootinit/common/ErrorCode.java.ftl",
+      "outputPath": "src/main/java/com/sihai/springbootinit/common/ErrorCode.java",
+      "type": "file",
+      "generateType": "dynamic"
+    },
+    {
+      "inputPath": ".idea/.gitignore",
+      "outputPath": ".idea/.gitignore",
+      "type": "file",
+      "generateType": "static"
+    },
+    {
+      "inputPath": "src/main/java/com/sihai/springbootinit/common/PageRequest.java.ftl",
+      "outputPath": "src/main/java/com/sihai/springbootinit/common/PageRequest.java",
+      "type": "file",
+      "generateType": "dynamic"
+    },
+    {
+      "inputPath": "README.md",
+      "outputPath": "README.md",
+      "type": "file",
+      "generateType": "static"
+    },
+    {
+      "inputPath": "Dockerfile",
+      "outputPath": "Dockerfile",
+      "type": "file",
+      "generateType": "static"
+    },
+    {
+      "inputPath": "src/main/java/com/sihai/springbootinit/controller/UserController.java.ftl",
+      "outputPath": "src/main/java/com/sihai/springbootinit/controller/UserController.java",
+      "type": "file",
+      "generateType": "dynamic"
+    },
+    {
+      "inputPath": "src/main/java/com/sihai/springbootinit/service/impl/UserServiceImpl.java.ftl",
+      "outputPath": "src/main/java/com/sihai/springbootinit/service/impl/UserServiceImpl.java",
+      "type": "file",
+      "generateType": "dynamic"
+    },
+    {
+      "inputPath": "src/main/java/com/sihai/springbootinit/model/dto/user/UserUpdateRequest.java.ftl",
+      "outputPath": "src/main/java/com/sihai/springbootinit/model/dto/user/UserUpdateRequest.java",
+      "type": "file",
+      "generateType": "dynamic"
+    },
+    {
+      "inputPath": ".idea/compiler.xml",
+      "outputPath": ".idea/compiler.xml",
+      "type": "file",
+      "generateType": "static"
+    },
+    {
+      "inputPath": "src/main/resources/application.yml.ftl",
+      "outputPath": "src/main/resources/application.yml",
+      "type": "file",
+      "generateType": "dynamic"
+    },
+    {
+      "inputPath": "src/main/java/com/sihai/springbootinit/common/DeleteRequest.java.ftl",
+      "outputPath": "src/main/java/com/sihai/springbootinit/common/DeleteRequest.java",
+      "type": "file",
+      "generateType": "dynamic"
+    }
+  ]
+}
